@@ -1,1 +1,5 @@
-export {};
+export { logger } from './logger.js';
+export type { LogLevel } from './logger.js';
+export { findLockFile } from './lock-file.js';
+export { loadConfig } from './config.js';
+export type { DcacheConfig } from './config.js';

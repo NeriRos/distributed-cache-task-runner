@@ -24,12 +24,12 @@
 
 ## Section 3 — libs/config Implementation
 
-- [ ] Implement `libs/config/src/logger.ts` — leveled logger (`debug`, `info`, `warn`, `error`) writing to stderr, level controlled by `DCACHE_LOG_LEVEL` env var, default `info`
-- [ ] Implement `libs/config/src/lock-file.ts` — `findLockFile(cwd: string): string | null` that checks for `bun.lockb`, `bun.lock`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` in order
-- [ ] Implement `libs/config/src/config.ts` — `loadConfig(cwd?: string): DcacheConfig` that reads optional `dcache.config.json`, merges with env vars (`DCACHE_CACHE_DIR`, `DCACHE_LOG_LEVEL`), applies defaults (cache dir: `node_modules/.cache/dcache`)
-- [ ] Update `libs/config/src/index.ts` — re-export all public types and functions
-- [ ] Write unit tests in `libs/config/src/*.spec.ts` — test logger output suppression at different levels, lock file detection with temp dirs, config defaults and override merging
-- [ ] Verify: `npx nx test config` passes, `npx nx build config` produces dist output
+- [x] Implement `libs/config/src/logger.ts` — leveled logger (`debug`, `info`, `warn`, `error`) writing to stderr, level controlled by `DCACHE_LOG_LEVEL` env var, default `info`
+- [x] Implement `libs/config/src/lock-file.ts` — `findLockFile(cwd: string): string | null` that checks for `bun.lockb`, `bun.lock`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` in order
+- [x] Implement `libs/config/src/config.ts` — `loadConfig(cwd?: string): DcacheConfig` that reads optional `dcache.config.json`, merges with env vars (`DCACHE_CACHE_DIR`, `DCACHE_LOG_LEVEL`), applies defaults (cache dir: `node_modules/.cache/dcache`)
+- [x] Update `libs/config/src/index.ts` — re-export all public types and functions
+- [x] Write unit tests in `libs/config/src/*.spec.ts` — 21 tests across 3 files: logger level suppression, lock file detection with temp dirs, config defaults and override merging
+- [x] Verify: `nx affected -t test,lint,typecheck` passes, `nx run config:build` produces dist output. Also fixed vite.config.ts root path so tests are discoverable.
 
 ## Section 4 — libs/hasher Implementation
 
