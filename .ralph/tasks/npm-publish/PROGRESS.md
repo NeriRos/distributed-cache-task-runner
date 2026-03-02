@@ -8,9 +8,9 @@
 
 ## Section 2 — Package manifest, Nx targets, and README
 
-- [ ] Create `apps/dcache/package.json` with: `name: "@neriros/dcache"`, `version: "0.1.0"`, `type: "module"`, `bin: { "dcache": "./bin/dcache.js" }`, `files: ["bin/"]`, `engines: { "node": ">=18" }`
-- [ ] Modify `apps/dcache/project.json` — add `bundle` target (runs esbuild config, outputs to `dist/apps/dcache`, `dependsOn: ["^build"]`) and `publish` target (copies package.json + README to dist, runs `npm publish --access public` from `dist/apps/dcache`)
-- [ ] Create `apps/dcache/README.md` — brief description, install command (`npm i -g @neriros/dcache`), basic usage
+- [x] Create `apps/dcache/package.json` with: `name: "@neriros/dcache"`, `version: "0.1.0"`, `type: "module"`, `bin: { "dcache": "./bin/dcache.js" }`, `files: ["bin/"]`, `engines: { "node": ">=18" }`
+- [x] Modify `apps/dcache/project.json` — add `bundle` target (runs esbuild config, outputs to `dist/apps/dcache`, `dependsOn: ["^build"]`) and `publish` target (copies package.json + README to dist, runs `npm publish --access public` from `dist/apps/dcache`)
+- [x] Create `apps/dcache/README.md` — brief description, install command (`npm i -g @neriros/dcache`), basic usage
 
 ## Section 3 — Integration test and verification
 

@@ -1,0 +1,14 @@
+{
+  "name": "@neriros/dcache",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "dcache": "./bin/dcache.js"
+  },
+  "files": [
+    "bin/"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
