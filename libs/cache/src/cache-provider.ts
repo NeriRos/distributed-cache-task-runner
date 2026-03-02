@@ -1,0 +1,16 @@
+export interface CacheEntry {
+  hash: string;
+  task: string;
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  createdAt: string;
+  durationMs: number;
+}
+
+export interface CacheProvider {
+  get(hash: string): Promise<CacheEntry | null>;
+  set(hash: string, entry: CacheEntry): Promise<void>;
+  has(hash: string): Promise<boolean>;
+  clear(): Promise<void>;
+}

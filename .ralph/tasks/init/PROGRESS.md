@@ -41,14 +41,14 @@
 
 ## Section 5 — libs/cache + libs/runner Implementation
 
-- [ ] Implement `libs/cache/src/cache-provider.ts` — export `CacheEntry` interface and `CacheProvider` interface (get, set, has, clear)
-- [ ] Implement `libs/cache/src/filesystem-provider.ts` — `FilesystemCacheProvider` class implementing `CacheProvider`: resolves cache dir from config, uses 2-char prefix subdirectories, atomic writes via `fs.mkdtemp` + `fs.rename`, JSON serialization
-- [ ] Update `libs/cache/src/index.ts` — re-export types and `FilesystemCacheProvider`
-- [ ] Write unit tests in `libs/cache/src/*.spec.ts` — test set/get/has/clear cycle, 2-char prefix path structure, missing entry returns null, clear removes all entries
-- [ ] Implement `libs/runner/src/task-runner.ts` — `runTask(command: string, args?: string[]): Promise<{ exitCode: number; stdout: string; stderr: string; durationMs: number }>` using `node:child_process` spawn, captures stdout/stderr as strings, returns exit code and duration
-- [ ] Update `libs/runner/src/index.ts` — re-export `runTask`
-- [ ] Write unit tests in `libs/runner/src/*.spec.ts` — test successful command, failing command exit code, stdout/stderr capture
-- [ ] Verify: `npx nx test cache` and `npx nx test runner` pass, builds succeed
+- [x] Implement `libs/cache/src/cache-provider.ts` — export `CacheEntry` interface and `CacheProvider` interface (get, set, has, clear)
+- [x] Implement `libs/cache/src/filesystem-provider.ts` — `FilesystemCacheProvider` class implementing `CacheProvider`: resolves cache dir from config, uses 2-char prefix subdirectories, atomic writes via `fs.mkdtemp` + `fs.rename`, JSON serialization
+- [x] Update `libs/cache/src/index.ts` — re-export types and `FilesystemCacheProvider`
+- [x] Write unit tests in `libs/cache/src/*.spec.ts` — test set/get/has/clear cycle, 2-char prefix path structure, missing entry returns null, clear removes all entries (7 tests)
+- [x] Implement `libs/runner/src/task-runner.ts` — `runTask(command: string, args?: string[]): Promise<{ exitCode: number; stdout: string; stderr: string; durationMs: number }>` using `node:child_process` spawn, captures stdout/stderr as strings, returns exit code and duration
+- [x] Update `libs/runner/src/index.ts` — re-export `runTask`
+- [x] Write unit tests in `libs/runner/src/*.spec.ts` — test successful command, failing command exit code, stdout/stderr capture (6 tests)
+- [x] Verify: `npx nx test cache` and `npx nx test runner` pass, builds succeed
 
 ## Section 6 — libs/nx-integration Implementation
 
