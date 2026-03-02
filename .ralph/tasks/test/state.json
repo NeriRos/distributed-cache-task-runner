@@ -2,11 +2,11 @@
   "version": "1",
   "name": "test",
   "prompt": "create a demo project in examples folder with the npm package and manually test it",
-  "phase": "exec",
-  "phaseIteration": 3,
+  "phase": "review",
+  "phaseIteration": 0,
   "totalIterations": 4,
   "createdAt": "2026-03-02T11:42:01Z",
-  "lastModified": "2026-03-02T11:49:22Z",
+  "lastModified": "2026-03-02T12:23:10Z",
   "engine": "claude",
   "model": "opus",
   "status": "active",
@@ -74,6 +74,14 @@
       "engine": "claude",
       "model": "opus",
       "result": "issues found -> loop back to exec"
+    },
+    {
+      "timestamp": "2026-03-02T12:23:10Z",
+      "phase": "exec",
+      "iteration": 0,
+      "engine": "claude",
+      "model": "opus",
+      "result": "advance -> review"
     }
   ],
   "metadata": {
