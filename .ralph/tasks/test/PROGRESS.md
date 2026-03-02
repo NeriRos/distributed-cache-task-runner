@@ -16,10 +16,10 @@
 
 ## Section 2 — Manual testing and verification
 
-- [ ] From `examples/basic/`, run `bun run dcache:help` — verify help output renders
-- [ ] From `examples/basic/`, run `bun run dcache:run -- "echo hello" --glob "src/**/*.ts"` — verify cache miss, task executes, `.dcache/` dir created with cache entry
-- [ ] Run same command again — verify cache hit, output replayed without re-executing
-- [ ] Modify `examples/basic/src/utils.ts` (e.g., add a comment), re-run — verify cache miss (invalidation)
-- [ ] Run `bun run dcache:clear` — verify `.dcache/` contents are cleared
-- [ ] If any issues found, fix and re-test
-- [ ] Commit all new files: `git add examples/ package.json bun.lock && git commit -m "feat: add basic example for manual CLI testing"`
+- [x] From `examples/basic/`, run `bun run dcache:help` — verify help output renders
+- [x] From `examples/basic/`, run `bun run dcache:run -- "echo hello" --glob "src/**/*.ts"` — verify cache miss, task executes, `.dcache/` dir created with cache entry
+- [x] Run same command again — verify cache hit, output replayed without re-executing
+- [x] Modify `examples/basic/src/utils.ts` (e.g., add a comment), re-run — verify cache miss (invalidation)
+- [x] Run `bun run dcache:clear` — verify `.dcache/` contents are cleared
+- [x] If any issues found, fix and re-test — no issues found, all tests passed
+- [x] Commit all new files — already committed in exec iteration 1 (06db1ce)
