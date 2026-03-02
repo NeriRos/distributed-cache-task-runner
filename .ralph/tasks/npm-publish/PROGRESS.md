@@ -2,9 +2,9 @@
 
 ## Section 1 — Install esbuild and create bundle config
 
-- [ ] Add `esbuild` to root `package.json` devDependencies and run `bun install`
-- [ ] Create `apps/dcache/esbuild.config.ts` — esbuild script that bundles `apps/dcache/src/main.ts` to `dist/apps/dcache/bin/dcache.js` (ESM, platform node, bundle all deps, shebang banner)
-- [ ] Test the bundle by running the esbuild config directly — verify output file is created and contains no bare `@dcache/*` imports
+- [x] Add `esbuild` to root `package.json` devDependencies and run `bun install`
+- [x] Create `apps/dcache/esbuild.config.ts` — esbuild script that bundles `apps/dcache/src/main.ts` to `dist/apps/dcache/bin/dcache.js` (ESM, platform node, bundle all deps, shebang banner)
+- [x] Test the bundle by running the esbuild config directly — verify output file is created and contains no bare `@dcache/*` imports
 
 ## Section 2 — Package manifest, Nx targets, and README
 
