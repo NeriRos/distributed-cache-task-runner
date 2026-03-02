@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 
-// Entry point for the dcache CLI binary.
-// Will import and call main() from @dcache/cli once implemented.
+import { main } from '@dcache/cli';
+
+const exitCode = await main(process.argv.slice(2));
+process.exitCode = exitCode;

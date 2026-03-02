@@ -6,12 +6,10 @@
   "tags": ["scope:cli"],
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/cli"],
       "options": {
-        "outputPath": "dist/libs/cli",
-        "tsConfig": "libs/cli/tsconfig.lib.json",
-        "main": "libs/cli/src/index.ts"
+        "command": "tsc -p libs/cli/tsconfig.lib.json --outDir dist/libs/cli"
       }
     },
     "test": {

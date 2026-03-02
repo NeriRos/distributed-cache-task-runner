@@ -2,5 +2,8 @@
   "name": "@dcache/dcache",
   "version": "0.0.0",
   "type": "module",
-  "private": true
+  "private": true,
+  "bin": {
+    "dcache": "./src/main.ts"
+  }
 }
