@@ -33,11 +33,11 @@
 
 ## Section 4 — libs/hasher Implementation
 
-- [ ] Implement `libs/hasher/src/file-hasher.ts` — `hashFile(filePath: string): Promise<string>` using `node:crypto` SHA-256 streaming, and `hashFiles(filePaths: string[]): Promise<string>` that sorts paths lexicographically, hashes each, then combines into single hash
-- [ ] Implement `libs/hasher/src/hasher.ts` — `computeHash(opts: { files: string[]; lockFilePath?: string; taskManifest: Record<string, unknown> }): Promise<string>` that combines file hash + lock file hash + `sha256(JSON.stringify(taskManifest))` into final hash
-- [ ] Update `libs/hasher/src/index.ts` — re-export `hashFile`, `hashFiles`, `computeHash`
-- [ ] Write unit tests in `libs/hasher/src/*.spec.ts` — test deterministic output for same inputs, different output for different file contents, correct handling of missing lock file, task manifest ordering independence
-- [ ] Verify: `npx nx test hasher` passes, `npx nx build hasher` succeeds
+- [x] Implement `libs/hasher/src/file-hasher.ts` — `hashFile` (streaming SHA-256) and `hashFiles` (sorts paths, hashes each, combines)
+- [x] Implement `libs/hasher/src/hasher.ts` — `computeHash` combining file hash + lock file hash + sorted manifest hash
+- [x] Update `libs/hasher/src/index.ts` — re-exports `hashFile`, `hashFiles`, `computeHash`, `ComputeHashOptions`
+- [x] Write unit tests in `libs/hasher/src/*.spec.ts` — 14 tests covering determinism, different content, missing files, lock file inclusion, manifest ordering independence
+- [x] Verify: `nx affected -t test,lint,typecheck` passes, `nx build hasher` succeeds. Also fixed `vite.config.ts` to include `root: __dirname` for test discovery.
 
 ## Section 5 — libs/cache + libs/runner Implementation
 
