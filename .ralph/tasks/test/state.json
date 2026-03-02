@@ -2,14 +2,14 @@
   "version": "1",
   "name": "test",
   "prompt": "create a demo project in examples folder with the npm package and manually test it",
-  "phase": "review",
-  "phaseIteration": 0,
-  "totalIterations": 4,
+  "phase": "done",
+  "phaseIteration": 2,
+  "totalIterations": 6,
   "createdAt": "2026-03-02T11:42:01Z",
-  "lastModified": "2026-03-02T12:23:10Z",
+  "lastModified": "2026-03-02T12:24:25Z",
   "engine": "claude",
   "model": "opus",
-  "status": "active",
+  "status": "completed",
   "history": [
     {
       "timestamp": "2026-03-02T11:45:08Z",
@@ -82,6 +82,38 @@
       "engine": "claude",
       "model": "opus",
       "result": "advance -> review"
+    },
+    {
+      "timestamp": "2026-03-02T12:23:26Z",
+      "phase": "review",
+      "iteration": 1,
+      "engine": "claude",
+      "model": "opus",
+      "result": "success"
+    },
+    {
+      "timestamp": "2026-03-02T12:23:26Z",
+      "phase": "exec",
+      "iteration": 1,
+      "engine": "claude",
+      "model": "opus",
+      "result": "auto-advance -> review"
+    },
+    {
+      "timestamp": "2026-03-02T12:24:25Z",
+      "phase": "review",
+      "iteration": 2,
+      "engine": "claude",
+      "model": "opus",
+      "result": "success"
+    },
+    {
+      "timestamp": "2026-03-02T12:24:25Z",
+      "phase": "review",
+      "iteration": 2,
+      "engine": "claude",
+      "model": "opus",
+      "result": "no issues found -> advance to done"
     }
   ],
   "metadata": {
