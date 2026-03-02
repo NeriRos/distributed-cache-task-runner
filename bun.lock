@@ -19,37 +19,33 @@
         "vitest": "^3.0.0",
       },
     },
-    "apps/dcache": {
-      "name": "@dcache/dcache",
-      "version": "0.0.0",
-    },
     "examples/basic": {
       "name": "@dcache/example-basic",
       "version": "0.0.0",
     },
     "libs/cache": {
       "name": "@dcache/cache",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
     "libs/cli": {
       "name": "@dcache/cli",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
     "libs/config": {
       "name": "@dcache/config",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
     "libs/hasher": {
       "name": "@dcache/hasher",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
     "libs/nx-integration": {
       "name": "@dcache/nx-integration",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
     "libs/runner": {
       "name": "@dcache/runner",
-      "version": "0.0.0",
+      "version": "1.0.0-0",
     },
   },
   "packages": {
@@ -254,8 +250,6 @@
     "@dcache/cli": ["@dcache/cli@workspace:libs/cli"],
 
     "@dcache/config": ["@dcache/config@workspace:libs/config"],
-
-    "@dcache/dcache": ["@dcache/dcache@workspace:apps/dcache"],
 
     "@dcache/example-basic": ["@dcache/example-basic@workspace:examples/basic"],
 
