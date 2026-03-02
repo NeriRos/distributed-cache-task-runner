@@ -2,17 +2,17 @@
 
 ## Section 1 — Scaffold the demo project
 
-- [ ] Add `"examples/*"` to `workspaces` array in root `package.json`
-- [ ] Create `examples/basic/package.json` with name `@dcache/example-basic`, scripts:
+- [x] Add `"examples/*"` to `workspaces` array in root `package.json`
+- [x] Create `examples/basic/package.json` with name `@dcache/example-basic`, scripts:
   - `dcache:run` → `bun run ../../apps/dcache/src/main.ts run`
   - `dcache:clear` → `bun run ../../apps/dcache/src/main.ts clear`
   - `dcache:help` → `bun run ../../apps/dcache/src/main.ts --help`
-- [ ] Create `examples/basic/dcache.config.json` with `{ "cacheDir": ".dcache" }`
-- [ ] Create `examples/basic/src/index.ts` — simple TypeScript file (e.g., exports a `greet` function)
-- [ ] Create `examples/basic/src/utils.ts` — second file (e.g., exports an `add` function)
-- [ ] Create `examples/basic/.gitignore` — ignore `.dcache/` and `node_modules/`
-- [ ] Create `examples/basic/README.md` — walkthrough of test scenarios (miss, hit, invalidate, clear)
-- [ ] Run `bun install` from repo root to register the new workspace
+- [x] Create `examples/basic/dcache.config.json` with `{ "cacheDir": ".dcache" }`
+- [x] Create `examples/basic/src/index.ts` — simple TypeScript file (e.g., exports a `greet` function)
+- [x] Create `examples/basic/src/utils.ts` — second file (e.g., exports an `add` function)
+- [x] Create `examples/basic/.gitignore` — ignore `.dcache/` and `node_modules/`
+- [x] Create `examples/basic/README.md` — walkthrough of test scenarios (miss, hit, invalidate, clear)
+- [x] Run `bun install` from repo root to register the new workspace
 
 ## Section 2 — Manual testing and verification
 

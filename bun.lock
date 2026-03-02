@@ -23,6 +23,10 @@
       "name": "@dcache/dcache",
       "version": "0.0.0",
     },
+    "examples/basic": {
+      "name": "@dcache/example-basic",
+      "version": "0.0.0",
+    },
     "libs/cache": {
       "name": "@dcache/cache",
       "version": "0.0.0",
@@ -252,6 +256,8 @@
     "@dcache/config": ["@dcache/config@workspace:libs/config"],
 
     "@dcache/dcache": ["@dcache/dcache@workspace:apps/dcache"],
+
+    "@dcache/example-basic": ["@dcache/example-basic@workspace:examples/basic"],
 
     "@dcache/hasher": ["@dcache/hasher@workspace:libs/hasher"],
 

@@ -1,0 +1,11 @@
+{
+  "name": "@dcache/example-basic",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dcache:run": "bun run ../../apps/dcache/src/main.ts run",
+    "dcache:clear": "bun run ../../apps/dcache/src/main.ts clear",
+    "dcache:help": "bun run ../../apps/dcache/src/main.ts --help"
+  }
+}
