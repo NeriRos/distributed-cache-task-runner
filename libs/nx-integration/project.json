@@ -1,0 +1,38 @@
+{
+  "name": "nx-integration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/nx-integration/src",
+  "projectType": "library",
+  "tags": ["scope:core"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/nx-integration",
+        "tsConfig": "libs/nx-integration/tsconfig.lib.json",
+        "main": "libs/nx-integration/src/index.ts"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/nx-integration"],
+      "options": {
+        "config": "libs/nx-integration/vite.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nx-integration/**/*.ts"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p libs/nx-integration/tsconfig.lib.json --noEmit"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "hasher",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/hasher/src",
+  "projectType": "library",
+  "tags": ["scope:core"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/hasher",
+        "tsConfig": "libs/hasher/tsconfig.lib.json",
+        "main": "libs/hasher/src/index.ts"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/hasher"],
+      "options": {
+        "config": "libs/hasher/vite.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/hasher/**/*.ts"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p libs/hasher/tsconfig.lib.json --noEmit"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "runner",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/runner/src",
+  "projectType": "library",
+  "tags": ["scope:core"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/runner",
+        "tsConfig": "libs/runner/tsconfig.lib.json",
+        "main": "libs/runner/src/index.ts"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/runner"],
+      "options": {
+        "config": "libs/runner/vite.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/runner/**/*.ts"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p libs/runner/tsconfig.lib.json --noEmit"
+      }
+    }
+  }
+}

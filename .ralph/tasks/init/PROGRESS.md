@@ -13,14 +13,14 @@
 
 ## Section 2 — Generate Library Projects
 
-- [ ] Generate `libs/config` via `npx nx g @nx/js:lib config --directory=libs/config --bundler=tsc --unitTestRunner=vitest --tags="scope:core" --importPath="@dcache/config" --minimal`
-- [ ] Generate `libs/hasher` via same pattern with `--tags="scope:core" --importPath="@dcache/hasher"`
-- [ ] Generate `libs/cache` via same pattern with `--tags="scope:core" --importPath="@dcache/cache"`
-- [ ] Generate `libs/runner` via same pattern with `--tags="scope:core" --importPath="@dcache/runner"`
-- [ ] Generate `libs/nx-integration` via same pattern with `--tags="scope:core" --importPath="@dcache/nx-integration"`
-- [ ] Generate `libs/cli` via same pattern with `--tags="scope:cli" --importPath="@dcache/cli"`
-- [ ] Create `apps/dcache/` directory structure manually: `project.json`, `tsconfig.json`, `src/main.ts` (shebang + imports `@dcache/cli`)
-- [ ] Run `npx nx run-many -t build` to verify all generated projects build cleanly (expect mostly empty but no errors)
+- [x] Generate `libs/config` — created manually (Nx generator conflicted with pre-existing path aliases). Includes project.json, tsconfig files, vite.config.ts, package.json, .eslintrc.json, src/index.ts
+- [x] Generate `libs/hasher` — same structure with `scope:core` tag
+- [x] Generate `libs/cache` — same structure with `scope:core` tag
+- [x] Generate `libs/runner` — same structure with `scope:core` tag
+- [x] Generate `libs/nx-integration` — same structure with `scope:core` tag
+- [x] Generate `libs/cli` — same structure with `scope:cli` tag
+- [x] Create `apps/dcache/` directory structure — project.json, tsconfig.json, tsconfig.app.json, package.json, .eslintrc.json, src/main.ts (shebang + placeholder for @dcache/cli import)
+- [x] Verify all projects build cleanly — `nx affected -t test,lint,typecheck,build` passes for all 7 projects (27 tasks). Fixed: added @nx/eslint-plugin, @typescript-eslint/parser, eslint@8 as dev deps; configured TS parser in root .eslintrc.json
 
 ## Section 3 — libs/config Implementation
 

@@ -1,0 +1,38 @@
+{
+  "name": "cache",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/cache/src",
+  "projectType": "library",
+  "tags": ["scope:core"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/cache",
+        "tsConfig": "libs/cache/tsconfig.lib.json",
+        "main": "libs/cache/src/index.ts"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/cache"],
+      "options": {
+        "config": "libs/cache/vite.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/cache/**/*.ts"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p libs/cache/tsconfig.lib.json --noEmit"
+      }
+    }
+  }
+}

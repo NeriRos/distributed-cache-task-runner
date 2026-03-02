@@ -5,6 +5,12 @@
   "overrides": [
     {
       "files": ["*.ts"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2022,
+        "sourceType": "module"
+      },
+      "plugins": ["@typescript-eslint"],
       "rules": {
         "@nx/enforce-module-boundaries": [
           "error",
