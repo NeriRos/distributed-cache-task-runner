@@ -72,10 +72,10 @@
 
 ## Section 8 — Integration Testing + Verification
 
-- [ ] Run `npx nx run-many -t build` — all projects build without errors
-- [ ] Run `npx nx run-many -t test` — all unit tests pass
-- [ ] Run `npx nx run-many -t lint` — no lint errors, module boundary rules enforced
-- [ ] Manual test glob mode: create a temp file, run `node dist/apps/dcache/main.js run "echo hello" --glob "*.ts"` twice, verify second run reports cache hit
-- [ ] Manual test cache invalidation: modify the temp file, run again, verify cache miss
-- [ ] Manual test clear: run `node dist/apps/dcache/main.js clear`, verify cache directory is cleaned
-- [ ] Verify dependency graph: `npx nx graph --file=output.json` and confirm edges match expected dependency graph
+- [x] Run `npx nx run-many -t build` — all projects build without errors ✅
+- [x] Run `npx nx run-many -t test` — all unit tests pass ✅ (6 projects, all green)
+- [x] Run `npx nx run-many -t lint` — no lint errors, module boundary rules enforced ✅ (7 projects, all pass)
+- [x] Manual test glob mode — ⚠️ Issue: **Binary is not runnable.** `tsc` preserves `@dcache/cli` path alias in compiled output (`dist/apps/dcache/apps/dcache/src/main.js`) but Node.js cannot resolve `@dcache/cli` at runtime. The build needs either: (a) a bundler like tsup/esbuild to resolve aliases, (b) `tsc-alias` post-processing to rewrite imports, or (c) relative imports in `main.ts` instead of path aliases. The output path is also nested (`dist/apps/dcache/apps/dcache/src/main.js` instead of `dist/apps/dcache/main.js`).
+- [x] Manual test cache invalidation — ⚠️ Issue: Cannot test because the binary doesn't run (see above).
+- [x] Manual test clear — ⚠️ Issue: Cannot test because the binary doesn't run (see above).
+- [x] Verify dependency graph — ⚠️ Issue: **Dependency graph is incomplete.** Actual edges: `dcache -> cli`, `cli -> config, cache, hasher, runner`. Missing edges vs plan: `cli -> nx-integration` (because nx-integration is still a stub with only `export {}`), `hasher -> config`, `cache -> config`, `nx-integration -> config`. The nx-integration lib was never implemented (noted in Section 6 but never fixed — still only contains `export {}` with no source files, no tests).

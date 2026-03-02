@@ -1,0 +1,625 @@
+{
+  "graph": {
+    "nodes": {
+      "nx-integration": {
+        "name": "nx-integration",
+        "type": "lib",
+        "data": {
+          "root": "libs/nx-integration",
+          "sourceRoot": "libs/nx-integration/src",
+          "name": "nx-integration",
+          "tags": [
+            "npm:public",
+            "scope:core"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/nx-integration",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/nx-integration",
+                "tsConfig": "libs/nx-integration/tsconfig.lib.json",
+                "main": "libs/nx-integration/src/index.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/nx-integration"
+              ],
+              "options": {
+                "config": "libs/nx-integration/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/nx-integration/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/nx-integration/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "config": {
+        "name": "config",
+        "type": "lib",
+        "data": {
+          "root": "libs/config",
+          "sourceRoot": "libs/config/src",
+          "name": "config",
+          "tags": [
+            "npm:public",
+            "scope:core"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/config",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/config",
+                "tsConfig": "libs/config/tsconfig.lib.json",
+                "main": "libs/config/src/index.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/config"
+              ],
+              "options": {
+                "config": "libs/config/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/config/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/config/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "dcache": {
+        "name": "dcache",
+        "type": "app",
+        "data": {
+          "root": "apps/dcache",
+          "sourceRoot": "apps/dcache/src",
+          "name": "dcache",
+          "tags": [
+            "npm:private",
+            "scope:app"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/dcache",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "build": {
+              "executor": "nx:run-commands",
+              "outputs": [
+                "{workspaceRoot}/dist/apps/dcache"
+              ],
+              "options": {
+                "command": "tsc -p apps/dcache/tsconfig.app.json --outDir dist/apps/dcache"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p apps/dcache/tsconfig.app.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "apps/dcache/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "application",
+          "implicitDependencies": []
+        }
+      },
+      "hasher": {
+        "name": "hasher",
+        "type": "lib",
+        "data": {
+          "root": "libs/hasher",
+          "sourceRoot": "libs/hasher/src",
+          "name": "hasher",
+          "tags": [
+            "npm:public",
+            "scope:core"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/hasher",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/hasher",
+                "tsConfig": "libs/hasher/tsconfig.lib.json",
+                "main": "libs/hasher/src/index.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/hasher"
+              ],
+              "options": {
+                "config": "libs/hasher/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/hasher/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/hasher/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "runner": {
+        "name": "runner",
+        "type": "lib",
+        "data": {
+          "root": "libs/runner",
+          "sourceRoot": "libs/runner/src",
+          "name": "runner",
+          "tags": [
+            "npm:public",
+            "scope:core"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/runner",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/runner",
+                "tsConfig": "libs/runner/tsconfig.lib.json",
+                "main": "libs/runner/src/index.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/runner"
+              ],
+              "options": {
+                "config": "libs/runner/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/runner/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/runner/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "cache": {
+        "name": "cache",
+        "type": "lib",
+        "data": {
+          "root": "libs/cache",
+          "sourceRoot": "libs/cache/src",
+          "name": "cache",
+          "tags": [
+            "npm:public",
+            "scope:core"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/cache",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/cache",
+                "tsConfig": "libs/cache/tsconfig.lib.json",
+                "main": "libs/cache/src/index.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/cache"
+              ],
+              "options": {
+                "config": "libs/cache/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/cache/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/cache/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "cli": {
+        "name": "cli",
+        "type": "lib",
+        "data": {
+          "root": "libs/cli",
+          "sourceRoot": "libs/cli/src",
+          "name": "cli",
+          "tags": [
+            "npm:public",
+            "scope:cli"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dcache/cli",
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-commands",
+              "outputs": [
+                "{workspaceRoot}/dist/libs/cli"
+              ],
+              "options": {
+                "command": "tsc -p libs/cli/tsconfig.lib.json --outDir dist/libs/cli"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/vite:test",
+              "outputs": [
+                "{workspaceRoot}/coverage/libs/cli"
+              ],
+              "options": {
+                "config": "libs/cli/vite.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/cli/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "typecheck": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "tsc -p libs/cli/tsconfig.lib.json --noEmit"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "nx-integration": [],
+      "config": [],
+      "dcache": [
+        {
+          "source": "dcache",
+          "target": "cli",
+          "type": "static"
+        }
+      ],
+      "hasher": [],
+      "runner": [],
+      "cache": [],
+      "cli": [
+        {
+          "source": "cli",
+          "target": "config",
+          "type": "static"
+        },
+        {
+          "source": "cli",
+          "target": "cache",
+          "type": "static"
+        },
+        {
+          "source": "cli",
+          "target": "hasher",
+          "type": "static"
+        },
+        {
+          "source": "cli",
+          "target": "runner",
+          "type": "static"
+        }
+      ]
+    }
+  }
+}
