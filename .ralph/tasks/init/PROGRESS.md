@@ -2,14 +2,14 @@
 
 ## Section 1 — Workspace Scaffolding
 
-- [ ] Create root `package.json` with `"name": "distributed-cache"`, `"type": "module"`, `"private": true`, bun workspaces config, and all dev dependencies (`nx`, `@nx/js`, `@nx/vite`, `@nx/eslint`, `typescript`, `vitest`, `@types/node`, `fast-glob`)
-- [ ] Create `nx.json` with task pipelines (`build` depends on `^build`), default project settings, cacheable operations (`build`, `test`, `lint`, `typecheck`)
-- [ ] Create `tsconfig.base.json` with shared compiler options (`target: ES2022`, `module: NodeNext`, `moduleResolution: NodeNext`, `strict: true`, `esModuleInterop: true`, `declaration: true`) and `paths` aliases for all six `@dcache/*` libraries
-- [ ] Create `.eslintrc.json` with `@nx/enforce-module-boundaries` rule and `depConstraints` for `scope:core`, `scope:cli`, `scope:app`
-- [ ] Create `.gitignore` (node_modules, dist, tmp, .cache, *.tsbuildinfo)
-- [ ] Create `CLAUDE.md` with build/test/lint commands, project conventions, and module structure
-- [ ] Run `bun install` to install all dependencies and verify no errors
-- [ ] Verify `npx nx --version` works
+- [x] Create root `package.json` with `"name": "distributed-cache"`, `"type": "module"`, `"private": true`, bun workspaces config, and all dev dependencies (`nx`, `@nx/js`, `@nx/vite`, `@nx/eslint`, `typescript`, `vitest`, `@types/node`, `fast-glob`)
+- [x] Create `nx.json` with task pipelines (`build` depends on `^build`), default project settings, cacheable operations (`build`, `test`, `lint`, `typecheck`)
+- [x] Create `tsconfig.base.json` with shared compiler options (`target: ES2022`, `module: NodeNext`, `moduleResolution: NodeNext`, `strict: true`, `esModuleInterop: true`, `declaration: true`) and `paths` aliases for all six `@dcache/*` libraries
+- [x] Create `.eslintrc.json` with `@nx/enforce-module-boundaries` rule and `depConstraints` for `scope:core`, `scope:cli`, `scope:app`
+- [x] Create `.gitignore` (node_modules, dist, tmp, .cache, *.tsbuildinfo)
+- [x] Create `CLAUDE.md` with build/test/lint commands, project conventions, and module structure
+- [x] Run `bun install` to install all dependencies and verify no errors
+- [x] Verify `npx nx --version` works
 
 ## Section 2 — Generate Library Projects
 

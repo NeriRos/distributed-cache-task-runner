@@ -1,0 +1,33 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "plugins": ["@nx"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "scope:core",
+                "onlyDependOnLibsWithTags": ["scope:core"]
+              },
+              {
+                "sourceTag": "scope:cli",
+                "onlyDependOnLibsWithTags": ["scope:core", "scope:cli"]
+              },
+              {
+                "sourceTag": "scope:app",
+                "onlyDependOnLibsWithTags": ["scope:cli", "scope:core", "scope:app"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
