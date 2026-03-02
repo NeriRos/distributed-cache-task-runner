@@ -14,13 +14,29 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@dcache/cli": ["libs/cli/src/index.ts"],
-      "@dcache/hasher": ["libs/hasher/src/index.ts"],
-      "@dcache/cache": ["libs/cache/src/index.ts"],
-      "@dcache/nx-integration": ["libs/nx-integration/src/index.ts"],
-      "@dcache/runner": ["libs/runner/src/index.ts"],
-      "@dcache/config": ["libs/config/src/index.ts"]
+      "@dcache/cache": [
+        "libs/cache/src/index.ts"
+      ],
+      "@dcache/cli": [
+        "libs/cli/src/index.ts"
+      ],
+      "@dcache/config": [
+        "libs/config/src/index.ts"
+      ],
+      "@dcache/hasher": [
+        "libs/hasher/src/index.ts"
+      ],
+      "@dcache/nx-integration": [
+        "libs/nx-integration/src/index.ts"
+      ],
+      "@dcache/runner": [
+        "libs/runner/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist", "tmp"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tmp"
+  ]
 }
