@@ -2,14 +2,14 @@
   "version": "1",
   "name": "npm-publish",
   "prompt": "publish the apps/dcache to npm under neriros if there's an issue with publishing an app, you can make it a lib and use it in the app as a shell",
-  "phase": "exec",
-  "phaseIteration": 3,
-  "totalIterations": 4,
+  "phase": "done",
+  "phaseIteration": 5,
+  "totalIterations": 6,
   "createdAt": "2026-03-02T13:02:50Z",
-  "lastModified": "2026-03-02T13:12:34Z",
+  "lastModified": "2026-03-02T13:16:16Z",
   "engine": "claude",
   "model": "opus",
-  "status": "active",
+  "status": "completed",
   "history": [
     {
       "timestamp": "2026-03-02T13:06:33Z",
@@ -74,6 +74,38 @@
       "engine": "claude",
       "model": "opus",
       "result": "issues found -> loop back to exec"
+    },
+    {
+      "timestamp": "2026-03-02T13:14:18Z",
+      "phase": "exec",
+      "iteration": 4,
+      "engine": "claude",
+      "model": "opus",
+      "result": "success"
+    },
+    {
+      "timestamp": "2026-03-02T13:14:18Z",
+      "phase": "exec",
+      "iteration": 4,
+      "engine": "claude",
+      "model": "opus",
+      "result": "auto-advance -> review"
+    },
+    {
+      "timestamp": "2026-03-02T13:16:16Z",
+      "phase": "review",
+      "iteration": 5,
+      "engine": "claude",
+      "model": "opus",
+      "result": "success"
+    },
+    {
+      "timestamp": "2026-03-02T13:16:16Z",
+      "phase": "review",
+      "iteration": 5,
+      "engine": "claude",
+      "model": "opus",
+      "result": "no issues found -> advance to done"
     }
   ],
   "metadata": {

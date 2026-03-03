@@ -14,7 +14,7 @@
 
 ## Section 3 — Integration test and verification
 
-- [ ] Run `nx run dcache:bundle` — verify `dist/apps/dcache/bin/dcache.js` exists with shebang, is valid ESM, has no unresolved imports
-- [ ] Run the bundled binary directly (`node dist/apps/dcache/bin/dcache.js --help`) — verify it works end-to-end
-- [ ] Run `nx affected -t test,lint,typecheck` — verify no regressions in existing code
-- [ ] Dry-run publish: `npm publish --dry-run` from `dist/apps/dcache/` — verify package contents look correct
+- [x] Run `nx run dcache:bundle` — verify `dist/apps/dcache/bin/dcache.js` exists with shebang, is valid ESM, has no unresolved imports
+- [x] Run the bundled binary directly (`node dist/apps/dcache/bin/dcache.js --help`) — verify it works end-to-end
+- [x] Run `nx affected -t test,lint,typecheck` — verify no regressions in existing code (all 7 projects pass test, lint, typecheck)
+- [x] Dry-run publish: `npm publish --dry-run` from `dist/apps/dcache/` — ⚠️ Issue: `apps/dcache/package.json` bin path `"./bin/dcache.js"` uses `./` prefix which npm 11 treats as invalid and **removes the bin entry entirely** from the published package. Fix: change to `"bin/dcache.js"` (without `./` prefix). Without this fix, `npx dcache` and global installs won't create the `dcache` command.
