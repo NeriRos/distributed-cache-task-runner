@@ -63,7 +63,7 @@ function parseCommand(parsed: RunParsed): { cmd: string; args: string[] } {
     const parts = parsed.taskCommand.split(/\s+/);
     return { cmd: parts[0], args: [...parts.slice(1), ...parsed.extraArgs] };
   }
-  return { cmd: parsed.task, args: parsed.extraArgs };
+  return { cmd: 'nx', args: ['run', `${parsed.project}:${parsed.task}`, ...parsed.extraArgs] };
 }
 
 function toRelative(cwd: string, path: string): string {

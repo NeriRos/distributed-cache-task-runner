@@ -41,7 +41,8 @@ function makeFakePool() {
     }
     if (trimmed.startsWith('INSERT')) {
       const [hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count] = values ?? [];
-      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count });
+      const parsedOutputs = typeof outputs === 'string' ? JSON.parse(outputs) : outputs;
+      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs: parsedOutputs, hit_count });
       return { rows: [] };
     }
     if (trimmed.startsWith('SELECT 1')) {
@@ -56,6 +57,34 @@ function makeFakePool() {
     if (trimmed.startsWith('TRUNCATE')) {
       if (trimmed.includes('_artifacts')) artifacts.clear();
       else store.clear();
+      return { rows: [] };
+    }
+    if (trimmed.startsWith('DELETE') && trimmed.includes('_artifacts') && trimmed.includes('IN (')) {
+      const cutoff = Date.parse(values?.[0] as string);
+      for (const [hash, row] of store) {
+        if (Date.parse(row.created_at as string) < cutoff) artifacts.delete(hash);
+      }
+      return { rows: [] };
+    }
+    if (trimmed.startsWith('DELETE') && trimmed.includes('_artifacts')) {
+      const hash = values?.[0] as string;
+      artifacts.delete(hash);
+      return { rows: [] };
+    }
+    if (trimmed.startsWith('DELETE') && trimmed.includes('RETURNING hash')) {
+      const cutoff = Date.parse(values?.[0] as string);
+      const removed: { hash: string }[] = [];
+      for (const [hash, row] of store) {
+        if (Date.parse(row.created_at as string) < cutoff) {
+          store.delete(hash);
+          removed.push({ hash });
+        }
+      }
+      return { rows: removed };
+    }
+    if (trimmed.startsWith('DELETE')) {
+      const hash = values?.[0] as string;
+      store.delete(hash);
       return { rows: [] };
     }
     throw new Error(`unexpected query: ${text}`);
@@ -146,6 +175,49 @@ describe('PostgresqlCacheProvider', () => {
     const { pool } = makeFakePool();
     const provider = new PostgresqlCacheProvider({ pool });
     expect(await provider.getArtifact('missing')).toBeNull();
+  });
+
+  describe('TTL', () => {
+    it('get returns null and evicts expired entry + artifact', async () => {
+      const { pool, store, artifacts } = makeFakePool();
+      const provider = new PostgresqlCacheProvider({ pool, ttlSeconds: 60 });
+      const stale = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      await provider.set('h1', makeCacheEntry({ hash: 'h1', createdAt: stale }));
+      await provider.setArtifact('h1', Buffer.from('data'));
+
+      expect(await provider.get('h1')).toBeNull();
+      expect(store.has('h1')).toBe(false);
+      expect(artifacts.has('h1')).toBe(false);
+    });
+
+    it('get returns fresh entry when within TTL', async () => {
+      const { pool } = makeFakePool();
+      const provider = new PostgresqlCacheProvider({ pool, ttlSeconds: 3600 });
+      const entry = makeCacheEntry({ hash: 'h1', createdAt: new Date().toISOString() });
+      await provider.set('h1', entry);
+      expect(await provider.get('h1')).toEqual(entry);
+    });
+
+    it('prune removes expired rows and returns the count', async () => {
+      const { pool, store, artifacts } = makeFakePool();
+      const provider = new PostgresqlCacheProvider({ pool, ttlSeconds: 60 });
+      await provider.set('stale', makeCacheEntry({ hash: 'stale', createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString() }));
+      await provider.setArtifact('stale', Buffer.from('s'));
+      await provider.set('fresh', makeCacheEntry({ hash: 'fresh', createdAt: new Date().toISOString() }));
+
+      expect(await provider.prune()).toBe(1);
+      expect(store.has('stale')).toBe(false);
+      expect(artifacts.has('stale')).toBe(false);
+      expect(store.has('fresh')).toBe(true);
+    });
+
+    it('prune is a no-op without ttlSeconds', async () => {
+      const { pool, store } = makeFakePool();
+      const provider = new PostgresqlCacheProvider({ pool });
+      await provider.set('h1', makeCacheEntry({ hash: 'h1', createdAt: '2000-01-01T00:00:00Z' }));
+      expect(await provider.prune()).toBe(0);
+      expect(store.has('h1')).toBe(true);
+    });
   });
 
   it('converts Date created_at from postgres back to ISO string', async () => {

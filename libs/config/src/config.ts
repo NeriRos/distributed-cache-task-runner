@@ -7,12 +7,15 @@ import type { LogLevel } from './logger.js';
 const FilesystemProviderSchema = z.object({
   type: z.literal('filesystem'),
   cacheDir: z.string().optional(),
+  ttlSeconds: z.number().int().positive().optional(),
 });
 
 const PostgresqlProviderSchema = z.object({
   type: z.literal('postgresql'),
   connectionString: z.string(),
   table: z.string().optional(),
+  ttlSeconds: z.number().int().positive().optional(),
+  statementTimeoutMs: z.number().int().nonnegative().optional(),
 });
 
 const ProviderSchema = z.discriminatedUnion('type', [
