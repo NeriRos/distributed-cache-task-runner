@@ -5,3 +5,4 @@ export {
   type PostgresqlCacheProviderOptions,
   type PostgresqlPool,
 } from './postgresql-provider.js';
+export { createCacheProvider, type ProviderConfig } from './create-provider.js';

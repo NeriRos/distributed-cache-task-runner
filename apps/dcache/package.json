@@ -1,6 +1,6 @@
 {
   "name": "@neriros/dcache",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "repository": {
     "type": "git",
@@ -14,5 +14,17 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "fast-glob": "^3.3.3",
+    "nx": "~20.4.0",
+    "zod": "^4.4.2"
+  },
+  "peerDependencies": {
+    "pg": "^8.20.0"
+  },
+  "peerDependenciesMeta": {
+    "pg": { "optional": true }
   }
 }

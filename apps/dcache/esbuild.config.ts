@@ -22,4 +22,5 @@ await build({
     '@dcache/nx-integration': './libs/nx-integration/src/index.ts',
     '@dcache/runner': './libs/runner/src/index.ts',
   },
+  packages: 'external',
 });
