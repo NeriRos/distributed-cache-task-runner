@@ -59,7 +59,7 @@ export class PostgresqlCacheProvider implements CacheProvider {
          created_at = EXCLUDED.created_at,
          duration_ms = EXCLUDED.duration_ms,
          outputs = EXCLUDED.outputs`,
-      [hash, entry.task, entry.exitCode, entry.stdout, entry.stderr, entry.createdAt, entry.durationMs, entry.outputs],
+      [hash, entry.task, entry.exitCode, entry.stdout, entry.stderr, entry.createdAt, entry.durationMs, JSON.stringify(entry.outputs)],
     );
   }
 

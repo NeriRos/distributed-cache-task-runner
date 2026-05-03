@@ -40,7 +40,8 @@ function makeFakePool() {
     }
     if (trimmed.startsWith('INSERT')) {
       const [hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs] = values ?? [];
-      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs });
+      const parsedOutputs = typeof outputs === 'string' ? JSON.parse(outputs) : outputs;
+      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs: parsedOutputs });
       return { rows: [] };
     }
     if (trimmed.startsWith('SELECT 1')) {
