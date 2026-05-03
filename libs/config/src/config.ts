@@ -15,6 +15,7 @@ const PostgresqlProviderSchema = z.object({
   connectionString: z.string(),
   table: z.string().optional(),
   ttlSeconds: z.number().int().positive().optional(),
+  statementTimeoutMs: z.number().int().nonnegative().optional(),
 });
 
 const ProviderSchema = z.discriminatedUnion('type', [
