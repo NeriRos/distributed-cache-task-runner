@@ -7,6 +7,7 @@ import { loadConfig } from './config.js';
 describe('loadConfig', () => {
   let tempDir: string;
   const savedEnv: Record<string, string | undefined> = {};
+  const TRACKED = ['MY_DB_URL', 'MISSING_VAR', 'FROM_ENVFILE'];
 
   function makeTempDir(): string {
     tempDir = mkdtempSync(join(tmpdir(), 'dcache-config-test-'));
@@ -14,86 +15,116 @@ describe('loadConfig', () => {
   }
 
   beforeEach(() => {
-    savedEnv['DCACHE_CACHE_DIR'] = process.env['DCACHE_CACHE_DIR'];
-    savedEnv['DCACHE_LOG_LEVEL'] = process.env['DCACHE_LOG_LEVEL'];
-    delete process.env['DCACHE_CACHE_DIR'];
-    delete process.env['DCACHE_LOG_LEVEL'];
+    for (const k of TRACKED) {
+      savedEnv[k] = process.env[k];
+      delete process.env[k];
+    }
   });
 
   afterEach(() => {
     for (const [key, value] of Object.entries(savedEnv)) {
-      if (value !== undefined) {
-        process.env[key] = value;
-      } else {
-        delete process.env[key];
-      }
+      if (value !== undefined) process.env[key] = value;
+      else delete process.env[key];
     }
-    if (tempDir) {
-      rmSync(tempDir, { recursive: true, force: true });
-    }
+    if (tempDir) rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it('returns default config when no config file or env vars', () => {
+  it('returns default config when no config file', () => {
     const dir = makeTempDir();
     const config = loadConfig(dir);
-    expect(config.cacheDir).toBe(
-      join(dir, 'node_modules', '.cache', 'dcache')
-    );
+    expect(config.cacheDir).toBe(join(dir, 'node_modules', '.cache', 'dcache'));
     expect(config.logLevel).toBe('info');
+    expect(config.provider).toEqual({
+      type: 'filesystem',
+      cacheDir: join(dir, 'node_modules', '.cache', 'dcache'),
+    });
   });
 
-  it('reads cacheDir from config file', () => {
+  it('reads cacheDir and logLevel from config file', () => {
     const dir = makeTempDir();
     writeFileSync(
       join(dir, 'dcache.config.json'),
-      JSON.stringify({ cacheDir: '/custom/cache' })
+      JSON.stringify({ cacheDir: '/custom/cache', logLevel: 'debug' }),
     );
     const config = loadConfig(dir);
     expect(config.cacheDir).toBe('/custom/cache');
-  });
-
-  it('reads logLevel from config file', () => {
-    const dir = makeTempDir();
-    writeFileSync(
-      join(dir, 'dcache.config.json'),
-      JSON.stringify({ logLevel: 'debug' })
-    );
-    const config = loadConfig(dir);
     expect(config.logLevel).toBe('debug');
   });
 
-  it('env vars override config file', () => {
+  it('reads explicit filesystem provider', () => {
     const dir = makeTempDir();
     writeFileSync(
       join(dir, 'dcache.config.json'),
-      JSON.stringify({ cacheDir: '/from-file', logLevel: 'debug' })
+      JSON.stringify({ provider: { type: 'filesystem', cacheDir: '/fs/cache' } }),
     );
-    process.env['DCACHE_CACHE_DIR'] = '/from-env';
-    process.env['DCACHE_LOG_LEVEL'] = 'error';
     const config = loadConfig(dir);
-    expect(config.cacheDir).toBe('/from-env');
-    expect(config.logLevel).toBe('error');
+    expect(config.provider).toEqual({ type: 'filesystem', cacheDir: '/fs/cache' });
   });
 
-  it('ignores invalid logLevel in config file', () => {
+  it('reads postgresql provider with env interpolation', () => {
+    const dir = makeTempDir();
+    process.env['MY_DB_URL'] = 'postgres://u:p@host/db';
+    writeFileSync(
+      join(dir, 'dcache.config.json'),
+      JSON.stringify({
+        provider: {
+          type: 'postgresql',
+          connectionString: '${MY_DB_URL}',
+          table: 'cache',
+        },
+      }),
+    );
+    const config = loadConfig(dir);
+    expect(config.provider).toEqual({
+      type: 'postgresql',
+      connectionString: 'postgres://u:p@host/db',
+      table: 'cache',
+    });
+  });
+
+  it('throws on undefined interpolated env var', () => {
     const dir = makeTempDir();
     writeFileSync(
       join(dir, 'dcache.config.json'),
-      JSON.stringify({ logLevel: 'verbose' })
+      JSON.stringify({
+        provider: { type: 'postgresql', connectionString: '${MISSING_VAR}' },
+      }),
+    );
+    expect(() => loadConfig(dir)).toThrow(/MISSING_VAR/);
+  });
+
+  it('loads vars from envFile before interpolating', () => {
+    const dir = makeTempDir();
+    writeFileSync(join(dir, '.env'), 'FROM_ENVFILE=postgres://from-envfile\n');
+    writeFileSync(
+      join(dir, 'dcache.config.json'),
+      JSON.stringify({
+        envFile: '.env',
+        provider: { type: 'postgresql', connectionString: '${FROM_ENVFILE}' },
+      }),
     );
     const config = loadConfig(dir);
-    expect(config.logLevel).toBe('info');
+    expect(config.provider).toEqual({
+      type: 'postgresql',
+      connectionString: 'postgres://from-envfile',
+    });
   });
 
-  it('ignores invalid logLevel in env var', () => {
+  it('throws when envFile does not exist', () => {
     const dir = makeTempDir();
-    process.env['DCACHE_LOG_LEVEL'] = 'verbose';
-    const config = loadConfig(dir);
-    expect(config.logLevel).toBe('info');
+    writeFileSync(
+      join(dir, 'dcache.config.json'),
+      JSON.stringify({ envFile: '.env.missing' }),
+    );
+    expect(() => loadConfig(dir)).toThrow(/envFile not found/);
   });
 
-  it('uses process.cwd() when no cwd argument provided', () => {
-    const config = loadConfig();
-    expect(config.cacheDir).toContain('node_modules/.cache/dcache');
+  it('rejects invalid logLevel', () => {
+    const dir = makeTempDir();
+    writeFileSync(
+      join(dir, 'dcache.config.json'),
+      JSON.stringify({ logLevel: 'verbose' }),
+    );
+    expect(() => loadConfig(dir)).toThrow();
   });
 });

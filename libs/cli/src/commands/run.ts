@@ -1,7 +1,7 @@
 import fg from 'fast-glob';
 import { loadConfig, findLockFile, logger } from '@dcache/config';
 import { computeHash } from '@dcache/hasher';
-import { FilesystemCacheProvider } from '@dcache/cache';
+import { createCacheProvider } from '@dcache/cache';
 import { runTask } from '@dcache/runner';
 import { getProjectFiles } from '@dcache/nx-integration';
 import type { ParsedCommand } from '../index.js';
@@ -55,7 +55,7 @@ function parseCommand(parsed: RunParsed): { cmd: string; args: string[] } {
 export async function runCommand(parsed: RunParsed): Promise<number> {
   const config = loadConfig();
   const lockFilePath = findLockFile(process.cwd()) ?? undefined;
-  const cache = new FilesystemCacheProvider(config.cacheDir);
+  const cache = await createCacheProvider(config.provider, config.cacheDir);
 
   const files = await resolveFiles(parsed);
   if (parsed.mode === 'nx' && files.length === 0) {

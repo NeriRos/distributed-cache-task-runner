@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -6,15 +6,23 @@ import { runCommand } from './run.js';
 
 describe('runCommand', () => {
   let tempDir: string;
+  let originalCwd: string;
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), 'dcache-run-test-'));
-    vi.stubEnv('DCACHE_CACHE_DIR', join(tempDir, 'cache'));
-    vi.stubEnv('DCACHE_LOG_LEVEL', 'error');
+    writeFileSync(
+      join(tempDir, 'dcache.config.json'),
+      JSON.stringify({
+        cacheDir: join(tempDir, 'cache'),
+        logLevel: 'error',
+      }),
+    );
+    originalCwd = process.cwd();
+    process.chdir(tempDir);
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
+    process.chdir(originalCwd);
     rmSync(tempDir, { recursive: true, force: true });
   });
 
