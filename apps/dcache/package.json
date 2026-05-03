@@ -2,6 +2,10 @@
   "name": "@neriros/dcache",
   "version": "0.2.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeriRos/distributed-cache-task-runner.git"
+  },
   "bin": {
     "dcache": "./bin/dcache.js"
   },
