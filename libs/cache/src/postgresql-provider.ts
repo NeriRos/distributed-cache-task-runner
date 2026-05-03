@@ -30,7 +30,7 @@ export class PostgresqlCacheProvider implements CacheProvider {
   async get(hash: string): Promise<CacheEntry | null> {
     await this.ensureSchema();
     const { rows } = await this.pool.query(
-      `SELECT hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs
+      `SELECT hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count
        FROM ${this.table} WHERE hash = $1`,
       [hash],
     );
@@ -50,6 +50,7 @@ export class PostgresqlCacheProvider implements CacheProvider {
       createdAt,
       durationMs: Number(row.duration_ms),
       outputs: (row.outputs as string[] | null) ?? [],
+      hitCount: row.hit_count == null ? 0 : Number(row.hit_count),
     };
   }
 
@@ -57,8 +58,8 @@ export class PostgresqlCacheProvider implements CacheProvider {
     await this.ensureSchema();
     await this.pool.query(
       `INSERT INTO ${this.table}
-         (hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         (hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        ON CONFLICT (hash) DO UPDATE SET
          task = EXCLUDED.task,
          exit_code = EXCLUDED.exit_code,
@@ -66,8 +67,9 @@ export class PostgresqlCacheProvider implements CacheProvider {
          stderr = EXCLUDED.stderr,
          created_at = EXCLUDED.created_at,
          duration_ms = EXCLUDED.duration_ms,
-         outputs = EXCLUDED.outputs`,
-      [hash, entry.task, entry.exitCode, entry.stdout, entry.stderr, entry.createdAt, entry.durationMs, JSON.stringify(entry.outputs)],
+         outputs = EXCLUDED.outputs,
+         hit_count = EXCLUDED.hit_count`,
+      [hash, entry.task, entry.exitCode, entry.stdout, entry.stderr, entry.createdAt, entry.durationMs, JSON.stringify(entry.outputs), entry.hitCount ?? 0],
     );
   }
 
@@ -159,6 +161,9 @@ export class PostgresqlCacheProvider implements CacheProvider {
     );
     await this.pool.query(
       `ALTER TABLE ${this.table} ADD COLUMN IF NOT EXISTS outputs JSONB NOT NULL DEFAULT '[]'::jsonb`,
+    );
+    await this.pool.query(
+      `ALTER TABLE ${this.table} ADD COLUMN IF NOT EXISTS hit_count BIGINT NOT NULL DEFAULT 0`,
     );
     await this.pool.query(
       `CREATE TABLE IF NOT EXISTS ${this.artifactTable} (
