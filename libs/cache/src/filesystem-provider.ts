@@ -17,19 +17,13 @@ export class FilesystemCacheProvider implements CacheProvider {
       return null;
     }
     const raw = await readFile(filePath, 'utf-8');
-    return JSON.parse(raw) as CacheEntry;
+    const parsed = JSON.parse(raw) as Partial<CacheEntry>;
+    return { outputs: [], ...parsed } as CacheEntry;
   }
 
   async set(hash: string, entry: CacheEntry): Promise<void> {
-    const filePath = this.entryPath(hash);
-    const dir = this.prefixDir(hash);
-    await mkdir(dir, { recursive: true });
-
-    const tempDir = await mkdtemp(join(tmpdir(), 'dcache-write-'));
-    const tempFile = join(tempDir, 'entry.json');
-    await writeFile(tempFile, JSON.stringify(entry, null, 2), 'utf-8');
-    await rename(tempFile, filePath);
-    await rm(tempDir, { recursive: true, force: true });
+    await mkdir(this.prefixDir(hash), { recursive: true });
+    await this.atomicWrite(this.entryPath(hash), Buffer.from(JSON.stringify(entry, null, 2), 'utf-8'));
   }
 
   async has(hash: string): Promise<boolean> {
@@ -42,11 +36,37 @@ export class FilesystemCacheProvider implements CacheProvider {
     }
   }
 
+  async getArtifact(hash: string): Promise<Buffer | null> {
+    const filePath = this.artifactPath(hash);
+    if (!existsSync(filePath)) return null;
+    return readFile(filePath);
+  }
+
+  async setArtifact(hash: string, data: Buffer): Promise<void> {
+    await mkdir(this.prefixDir(hash), { recursive: true });
+    await this.atomicWrite(this.artifactPath(hash), data);
+  }
+
+  private async atomicWrite(targetPath: string, data: Buffer): Promise<void> {
+    const tempDir = await mkdtemp(join(tmpdir(), 'dcache-write-'));
+    const tempFile = join(tempDir, 'data');
+    try {
+      await writeFile(tempFile, data);
+      await rename(tempFile, targetPath);
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  }
+
   private prefixDir(hash: string): string {
     return join(this.cacheDir, hash.slice(0, 2));
   }
 
   private entryPath(hash: string): string {
     return join(this.prefixDir(hash), `${hash}.json`);
+  }
+
+  private artifactPath(hash: string): string {
+    return join(this.prefixDir(hash), `${hash}.tar.gz`);
   }
 }

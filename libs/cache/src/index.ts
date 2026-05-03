@@ -6,3 +6,4 @@ export {
   type PostgresqlPool,
 } from './postgresql-provider.js';
 export { createCacheProvider, type ProviderConfig } from './create-provider.js';
+export { packArtifact, extractArtifact } from './artifact.js';

@@ -26,6 +26,7 @@ describe('parseArgs', () => {
       mode: 'glob',
       taskCommand: 'nx lint mylib',
       glob: 'libs/mylib/src/**',
+      outputs: [],
       extraArgs: [],
     });
   });
@@ -38,6 +39,7 @@ describe('parseArgs', () => {
       mode: 'glob',
       taskCommand: 'echo hello',
       glob: '*.ts',
+      outputs: [],
       extraArgs: ['--verbose'],
     });
   });
@@ -50,6 +52,7 @@ describe('parseArgs', () => {
       mode: 'nx',
       task: 'lint',
       project: 'mylib',
+      outputs: [],
       extraArgs: [],
     });
   });
@@ -62,7 +65,43 @@ describe('parseArgs', () => {
       mode: 'nx',
       task: 'typecheck',
       project: 'shared',
+      outputs: [],
       extraArgs: ['--fix'],
+    });
+  });
+
+  it('collects --output flags (repeatable)', () => {
+    const result = parseArgs([
+      'run',
+      'build',
+      '--project',
+      'mylib',
+      '--output',
+      'dist',
+      '--output',
+      'build/types',
+    ]);
+
+    expect(result).toEqual({
+      command: 'run',
+      mode: 'nx',
+      task: 'build',
+      project: 'mylib',
+      outputs: ['dist', 'build/types'],
+      extraArgs: [],
+    });
+  });
+
+  it('--output works in glob mode too', () => {
+    const result = parseArgs(['run', 'tsc', '--glob', '*.ts', '--output', 'dist']);
+
+    expect(result).toEqual({
+      command: 'run',
+      mode: 'glob',
+      taskCommand: 'tsc',
+      glob: '*.ts',
+      outputs: ['dist'],
+      extraArgs: [],
     });
   });
 
