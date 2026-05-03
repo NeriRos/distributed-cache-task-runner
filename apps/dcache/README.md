@@ -55,29 +55,43 @@ Because the hash includes the lockfile, dependency upgrades automatically invali
 
 ## Configuration
 
-Resolved in this order (first wins):
+Configuration lives in `dcache.config.json` in the current working directory. If no file is present, the defaults below are used.
 
-| Source | Keys |
-|---|---|
-| Environment | `DCACHE_CACHE_DIR`, `DCACHE_LOG_LEVEL` |
-| `dcache.config.json` (in cwd) | `cacheDir`, `logLevel` |
-| Defaults | `cacheDir = node_modules/.cache/dcache`, `logLevel = info` |
+| Key | Type | Default |
+|---|---|---|
+| `cacheDir` | `string` | `node_modules/.cache/dcache` |
+| `logLevel` | `"debug" \| "info" \| "warn" \| "error"` | `"info"` |
+| `envFile` | `string` (path) | — |
+| `provider` | provider config (see below) | filesystem at `cacheDir` |
 
-`logLevel` accepts `debug`, `info`, `warn`, `error`.
+String values support `${ENV_VAR}` interpolation. Use `envFile` to load a `.env` before interpolation runs — keeps secrets out of the config file.
 
-Example `dcache.config.json`:
+### Filesystem provider (default)
 
 ```json
 {
   "cacheDir": ".dcache",
-  "logLevel": "debug"
+  "logLevel": "debug",
+  "provider": { "type": "filesystem" }
 }
 ```
 
-## Cache backends
+### PostgreSQL provider
 
-- **Filesystem** (default) — writes JSON entries under the configured `cacheDir`.
-- **PostgreSQL** — `PostgresqlCacheProvider` is shipped for shared/distributed use across machines and CI runners. CLI wiring for remote backends is on the roadmap; the provider is consumable today via the library API.
+Shared/distributed backend across machines and CI runners. Requires `pg` in the host project (`bun add pg` or `npm i pg`).
+
+```json
+{
+  "envFile": ".env",
+  "provider": {
+    "type": "postgresql",
+    "connectionString": "${DATABASE_URL}",
+    "table": "dcache_entries"
+  }
+}
+```
+
+`table` is optional and defaults to `dcache_entries`.
 
 ## License
 
