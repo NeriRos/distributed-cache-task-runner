@@ -3,6 +3,7 @@ import { loadConfig, findLockFile, logger } from '@dcache/config';
 import { computeHash } from '@dcache/hasher';
 import { FilesystemCacheProvider } from '@dcache/cache';
 import { runTask } from '@dcache/runner';
+import { getProjectFiles } from '@dcache/nx-integration';
 import type { ParsedCommand } from '../index.js';
 
 type RunParsed = ParsedCommand & { command: 'run' };
@@ -16,8 +17,16 @@ async function resolveFiles(parsed: RunParsed): Promise<string[]> {
     return files;
   }
 
-  logger.error('Nx mode is not yet available (nx-integration not implemented)');
-  return [];
+  try {
+    const { files, projectRoot } = await getProjectFiles(parsed.project);
+    if (files.length === 0) {
+      logger.warn(`Nx project "${parsed.project}" has no source files (root: ${projectRoot})`);
+    }
+    return files;
+  } catch (err) {
+    logger.error((err as Error).message);
+    return [];
+  }
 }
 
 function buildTaskManifest(parsed: RunParsed): Record<string, unknown> {
