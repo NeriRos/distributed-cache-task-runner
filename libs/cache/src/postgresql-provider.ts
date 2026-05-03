@@ -1,4 +1,4 @@
-import type { CacheEntry, CacheProvider } from './cache-provider.js';
+import { isExpired, type CacheEntry, type CacheProvider } from './cache-provider.js';
 
 export interface PostgresqlPool {
   query(text: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
@@ -7,21 +7,24 @@ export interface PostgresqlPool {
 export interface PostgresqlCacheProviderOptions {
   pool: PostgresqlPool;
   table?: string;
+  ttlSeconds?: number;
 }
 
 export class PostgresqlCacheProvider implements CacheProvider {
   private readonly pool: PostgresqlPool;
   private readonly table: string;
   private readonly artifactTable: string;
+  private readonly ttlSeconds: number | undefined;
   private initPromise: Promise<void> | null = null;
 
-  constructor({ pool, table = 'dcache_entries' }: PostgresqlCacheProviderOptions) {
+  constructor({ pool, table = 'dcache_entries', ttlSeconds }: PostgresqlCacheProviderOptions) {
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(table)) {
       throw new Error(`Invalid postgres table name: ${table}`);
     }
     this.pool = pool;
     this.table = table;
     this.artifactTable = `${table}_artifacts`;
+    this.ttlSeconds = ttlSeconds;
   }
 
   async get(hash: string): Promise<CacheEntry | null> {
@@ -33,13 +36,18 @@ export class PostgresqlCacheProvider implements CacheProvider {
     );
     const row = rows[0];
     if (!row) return null;
+    const createdAt = row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at);
+    if (isExpired(createdAt, this.ttlSeconds, new Date())) {
+      await this.deleteEntry(hash);
+      return null;
+    }
     return {
       hash: row.hash as string,
       task: row.task as string,
       exitCode: Number(row.exit_code),
       stdout: row.stdout as string,
       stderr: row.stderr as string,
-      createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+      createdAt,
       durationMs: Number(row.duration_ms),
       outputs: (row.outputs as string[] | null) ?? [],
     };
@@ -65,6 +73,9 @@ export class PostgresqlCacheProvider implements CacheProvider {
 
   async has(hash: string): Promise<boolean> {
     await this.ensureSchema();
+    if (this.ttlSeconds) {
+      return (await this.get(hash)) !== null;
+    }
     const { rows } = await this.pool.query(
       `SELECT 1 FROM ${this.table} WHERE hash = $1 LIMIT 1`,
       [hash],
@@ -76,6 +87,22 @@ export class PostgresqlCacheProvider implements CacheProvider {
     await this.ensureSchema();
     await this.pool.query(`TRUNCATE TABLE ${this.table}`);
     await this.pool.query(`TRUNCATE TABLE ${this.artifactTable}`);
+  }
+
+  async prune(now: Date = new Date()): Promise<number> {
+    if (!this.ttlSeconds || this.ttlSeconds <= 0) return 0;
+    await this.ensureSchema();
+    const cutoff = new Date(now.getTime() - this.ttlSeconds * 1000).toISOString();
+    await this.pool.query(
+      `DELETE FROM ${this.artifactTable}
+       WHERE hash IN (SELECT hash FROM ${this.table} WHERE created_at < $1)`,
+      [cutoff],
+    );
+    const { rows } = await this.pool.query(
+      `DELETE FROM ${this.table} WHERE created_at < $1 RETURNING hash`,
+      [cutoff],
+    );
+    return rows.length;
   }
 
   async getArtifact(hash: string): Promise<Buffer | null> {
@@ -100,6 +127,11 @@ export class PostgresqlCacheProvider implements CacheProvider {
        ON CONFLICT (hash) DO UPDATE SET data = EXCLUDED.data`,
       [hash, data],
     );
+  }
+
+  private async deleteEntry(hash: string): Promise<void> {
+    await this.pool.query(`DELETE FROM ${this.artifactTable} WHERE hash = $1`, [hash]);
+    await this.pool.query(`DELETE FROM ${this.table} WHERE hash = $1`, [hash]);
   }
 
   private ensureSchema(): Promise<void> {

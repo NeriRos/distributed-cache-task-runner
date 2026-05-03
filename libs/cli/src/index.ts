@@ -1,11 +1,13 @@
 import { logger } from '@dcache/config';
 import { runCommand } from './commands/run.js';
 import { clearCommand } from './commands/clear.js';
+import { pruneCommand } from './commands/prune.js';
 
 export type ParsedCommand =
   | { command: 'run'; mode: 'glob'; taskCommand: string; glob: string; outputs: string[]; extraArgs: string[] }
   | { command: 'run'; mode: 'nx'; task: string; project: string; outputs: string[]; extraArgs: string[] }
   | { command: 'clear' }
+  | { command: 'prune' }
   | { command: 'help' };
 
 const HELP_TEXT = `Usage: dcache <command> [options]
@@ -14,6 +16,7 @@ Commands:
   run <command> --glob <pattern>    Run with glob mode
   run <task> --project <name>       Run with nx mode
   clear                             Clear the cache
+  prune                             Remove expired entries (requires provider.ttlSeconds)
 
 Options:
   --glob <pattern>      Glob pattern for source files
@@ -52,6 +55,10 @@ export function parseArgs(argv: string[]): ParsedCommand {
     return { command: 'clear' };
   }
 
+  if (command === 'prune') {
+    return { command: 'prune' };
+  }
+
   if (command === 'run') {
     const { outputs, rest } = extractOutputs(argv.slice(1));
     const globIdx = rest.indexOf('--glob');
@@ -87,6 +94,8 @@ export async function main(argv: string[]): Promise<number> {
       return runCommand(parsed);
     case 'clear':
       return clearCommand();
+    case 'prune':
+      return pruneCommand();
     case 'help':
       process.stderr.write(HELP_TEXT);
       return 0;
