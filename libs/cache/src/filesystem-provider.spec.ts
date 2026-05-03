@@ -126,4 +126,55 @@ describe('FilesystemCacheProvider', () => {
     const got = await provider.getArtifact(hash);
     expect(got?.equals(data)).toBe(true);
   });
+
+  describe('TTL', () => {
+    const hash = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2';
+
+    it('get returns null and evicts expired entry + artifact', async () => {
+      const cacheDir = join(makeTempDir(), 'cache');
+      const provider = new FilesystemCacheProvider({ cacheDir, ttlSeconds: 60 });
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+      await provider.set(hash, makeCacheEntry({ hash, createdAt: oneHourAgo }));
+      await provider.setArtifact(hash, Buffer.from('blob'));
+
+      expect(await provider.get(hash)).toBeNull();
+      expect(await provider.has(hash)).toBe(false);
+      expect(await provider.getArtifact(hash)).toBeNull();
+    });
+
+    it('get returns fresh entry when within TTL', async () => {
+      const cacheDir = join(makeTempDir(), 'cache');
+      const provider = new FilesystemCacheProvider({ cacheDir, ttlSeconds: 3600 });
+      const fresh = new Date().toISOString();
+      const entry = makeCacheEntry({ hash, createdAt: fresh });
+
+      await provider.set(hash, entry);
+      expect(await provider.get(hash)).toEqual(entry);
+    });
+
+    it('prune removes only expired entries and reports the count', async () => {
+      const cacheDir = join(makeTempDir(), 'cache');
+      const provider = new FilesystemCacheProvider({ cacheDir, ttlSeconds: 60 });
+      const stale = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2';
+      const fresh = 'f0e1d2c3b4a5f0e1d2c3b4a5f0e1d2c3b4a5f0e1d2c3b4a5f0e1d2c3b4a5f0e1';
+
+      await provider.set(stale, makeCacheEntry({ hash: stale, createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString() }));
+      await provider.setArtifact(stale, Buffer.from('stale'));
+      await provider.set(fresh, makeCacheEntry({ hash: fresh, createdAt: new Date().toISOString() }));
+
+      expect(await provider.prune()).toBe(1);
+      expect(await provider.has(stale)).toBe(false);
+      expect(await provider.getArtifact(stale)).toBeNull();
+      expect(await provider.has(fresh)).toBe(true);
+    });
+
+    it('prune is a no-op without ttlSeconds', async () => {
+      const cacheDir = join(makeTempDir(), 'cache');
+      const provider = new FilesystemCacheProvider({ cacheDir });
+      await provider.set(hash, makeCacheEntry({ hash, createdAt: '2000-01-01T00:00:00Z' }));
+      expect(await provider.prune()).toBe(0);
+      expect(await provider.has(hash)).toBe(true);
+    });
+  });
 });

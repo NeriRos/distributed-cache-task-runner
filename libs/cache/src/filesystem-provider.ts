@@ -1,14 +1,26 @@
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import type { CacheEntry, CacheProvider } from './cache-provider.js';
+import { isExpired, type CacheEntry, type CacheProvider } from './cache-provider.js';
+
+export interface FilesystemCacheProviderOptions {
+  cacheDir: string;
+  ttlSeconds?: number;
+}
 
 export class FilesystemCacheProvider implements CacheProvider {
   private readonly cacheDir: string;
+  private readonly ttlSeconds: number | undefined;
 
-  constructor(cacheDir: string) {
-    this.cacheDir = cacheDir;
+  constructor(options: FilesystemCacheProviderOptions | string) {
+    if (typeof options === 'string') {
+      this.cacheDir = options;
+      this.ttlSeconds = undefined;
+    } else {
+      this.cacheDir = options.cacheDir;
+      this.ttlSeconds = options.ttlSeconds;
+    }
   }
 
   async get(hash: string): Promise<CacheEntry | null> {
@@ -18,7 +30,12 @@ export class FilesystemCacheProvider implements CacheProvider {
     }
     const raw = await readFile(filePath, 'utf-8');
     const parsed = JSON.parse(raw) as Partial<CacheEntry>;
-    return { outputs: [], ...parsed } as CacheEntry;
+    const entry = { outputs: [], ...parsed } as CacheEntry;
+    if (entry.createdAt && isExpired(entry.createdAt, this.ttlSeconds, new Date())) {
+      await this.deleteEntry(hash);
+      return null;
+    }
+    return entry;
   }
 
   async set(hash: string, entry: CacheEntry): Promise<void> {
@@ -27,13 +44,41 @@ export class FilesystemCacheProvider implements CacheProvider {
   }
 
   async has(hash: string): Promise<boolean> {
-    return existsSync(this.entryPath(hash));
+    if (!existsSync(this.entryPath(hash))) return false;
+    if (!this.ttlSeconds) return true;
+    return (await this.get(hash)) !== null;
   }
 
   async clear(): Promise<void> {
     if (existsSync(this.cacheDir)) {
       await rm(this.cacheDir, { recursive: true, force: true });
     }
+  }
+
+  async prune(now: Date = new Date()): Promise<number> {
+    if (!this.ttlSeconds || !existsSync(this.cacheDir)) return 0;
+    let evicted = 0;
+    const prefixes = await readdir(this.cacheDir, { withFileTypes: true });
+    for (const prefix of prefixes) {
+      if (!prefix.isDirectory()) continue;
+      const dir = join(this.cacheDir, prefix.name);
+      const files = await readdir(dir);
+      for (const file of files) {
+        if (!file.endsWith('.json')) continue;
+        const hash = file.slice(0, -5);
+        try {
+          const raw = await readFile(join(dir, file), 'utf-8');
+          const parsed = JSON.parse(raw) as Partial<CacheEntry>;
+          if (parsed.createdAt && isExpired(parsed.createdAt, this.ttlSeconds, now)) {
+            await this.deleteEntry(hash);
+            evicted++;
+          }
+        } catch {
+          // skip unreadable/corrupt entry
+        }
+      }
+    }
+    return evicted;
   }
 
   async getArtifact(hash: string): Promise<Buffer | null> {
@@ -45,6 +90,11 @@ export class FilesystemCacheProvider implements CacheProvider {
   async setArtifact(hash: string, data: Buffer): Promise<void> {
     await mkdir(this.prefixDir(hash), { recursive: true });
     await this.atomicWrite(this.artifactPath(hash), data);
+  }
+
+  private async deleteEntry(hash: string): Promise<void> {
+    await rm(this.entryPath(hash), { force: true });
+    await rm(this.artifactPath(hash), { force: true });
   }
 
   private async atomicWrite(targetPath: string, data: Buffer): Promise<void> {
