@@ -9,9 +9,9 @@ import type { ParsedCommand } from '../index.js';
 
 type RunParsed = ParsedCommand & { command: 'run' };
 
-async function resolveFiles(parsed: RunParsed): Promise<string[]> {
+async function resolveFiles(parsed: RunParsed, ignore: string[]): Promise<string[]> {
   if (parsed.mode === 'glob') {
-    const files = await fg(parsed.glob, { absolute: true, dot: false });
+    const files = await fg(parsed.glob, { absolute: true, dot: false, ignore });
     if (files.length === 0) {
       logger.warn(`No files matched glob pattern: ${parsed.glob}`);
     }
@@ -43,11 +43,12 @@ async function resolveOutputs(parsed: RunParsed): Promise<string[]> {
   return [];
 }
 
-function buildTaskManifest(parsed: RunParsed): Record<string, unknown> {
+function buildTaskManifest(parsed: RunParsed, ignore: string[]): Record<string, unknown> {
   if (parsed.mode === 'glob') {
     return {
       command: parsed.taskCommand,
       glob: parsed.glob,
+      ignore: [...ignore].sort(),
       extraArgs: parsed.extraArgs,
     };
   }
@@ -105,13 +106,14 @@ export async function runCommand(parsed: RunParsed): Promise<number> {
   const lockFilePath = findLockFile(cwd) ?? undefined;
   const cache = await createCacheProvider(config.provider, config.cacheDir);
 
-  const files = await resolveFiles(parsed);
+  const ignore = parsed.mode === 'glob' ? [...config.ignore, ...parsed.ignore] : [];
+  const files = await resolveFiles(parsed, ignore);
   if (parsed.mode === 'nx' && files.length === 0) {
     return 1;
   }
 
   const outputs = await resolveOutputs(parsed);
-  const taskManifest = buildTaskManifest(parsed);
+  const taskManifest = buildTaskManifest(parsed, ignore);
   const hash = await computeHash({ files, lockFilePath, taskManifest });
 
   logger.debug(`Computed hash: ${hash}`);

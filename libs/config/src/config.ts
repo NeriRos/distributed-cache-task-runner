@@ -29,6 +29,7 @@ const ConfigFileSchema = z.object({
   envFile: z.string().optional(),
   provider: ProviderSchema.optional(),
   benchmarkInterval: z.number().int().nonnegative().optional(),
+  ignore: z.array(z.string()).optional(),
 });
 
 export type ProviderConfig = z.infer<typeof ProviderSchema>;
@@ -40,6 +41,7 @@ export interface DcacheConfig {
   logLevel: LogLevel;
   provider: ProviderConfig;
   benchmarkInterval: number;
+  ignore: string[];
 }
 
 const INTERPOLATE_RE = /\$\{([A-Z0-9_]+)\}/gi;
@@ -105,6 +107,7 @@ export function loadConfig(cwd?: string): DcacheConfig {
   };
 
   const benchmarkInterval = parsed.benchmarkInterval ?? 100;
+  const ignore = parsed.ignore ?? [];
 
-  return { cacheDir, logLevel, provider, benchmarkInterval };
+  return { cacheDir, logLevel, provider, benchmarkInterval, ignore };
 }
