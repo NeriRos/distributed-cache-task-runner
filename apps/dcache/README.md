@@ -77,6 +77,7 @@ Configuration lives in `dcache.config.json` in the current working directory. If
 | `logLevel` | `"debug" \| "info" \| "warn" \| "error"` | `"info"` |
 | `envFile` | `string` (path) | — |
 | `ignore` | `string[]` | `[]` |
+| `respectGitignore` | `boolean` | `true` |
 | `provider` | provider config (see below) | filesystem at `cacheDir` |
 
 `ignore` patterns apply to every glob-mode `run` and are merged with any `--ignore` flags passed on the command line. Use this for paths that should always be excluded from the hash on this project (build outputs, local artifacts, etc.):
@@ -86,6 +87,8 @@ Configuration lives in `dcache.config.json` in the current working directory. If
   "ignore": ["**/dist/**", "**/.vercel/**", "**/coverage/**", "**/.nx/**"]
 }
 ```
+
+`respectGitignore` (default `true`) restricts glob matches to files that are tracked or untracked-but-not-ignored by git, using `git ls-files --cached --others --exclude-standard`. This is the most reliable way to keep developer-machine artifacts (build outputs, local logs, scratch files) out of the cache hash so it matches a fresh CI checkout. Falls back to keeping all matched files (with a warning) when not in a git repo. Set to `false` to disable.
 
 String values support `${ENV_VAR}` interpolation. Use `envFile` to load a `.env` before interpolation runs — keeps secrets out of the config file.
 

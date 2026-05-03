@@ -30,6 +30,7 @@ const ConfigFileSchema = z.object({
   provider: ProviderSchema.optional(),
   benchmarkInterval: z.number().int().nonnegative().optional(),
   ignore: z.array(z.string()).optional(),
+  respectGitignore: z.boolean().optional(),
 });
 
 export type ProviderConfig = z.infer<typeof ProviderSchema>;
@@ -42,6 +43,7 @@ export interface DcacheConfig {
   provider: ProviderConfig;
   benchmarkInterval: number;
   ignore: string[];
+  respectGitignore: boolean;
 }
 
 const INTERPOLATE_RE = /\$\{([A-Z0-9_]+)\}/gi;
@@ -108,6 +110,7 @@ export function loadConfig(cwd?: string): DcacheConfig {
 
   const benchmarkInterval = parsed.benchmarkInterval ?? 100;
   const ignore = parsed.ignore ?? [];
+  const respectGitignore = parsed.respectGitignore ?? true;
 
-  return { cacheDir, logLevel, provider, benchmarkInterval, ignore };
+  return { cacheDir, logLevel, provider, benchmarkInterval, ignore, respectGitignore };
 }

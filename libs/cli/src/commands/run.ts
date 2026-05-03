@@ -1,4 +1,5 @@
-import { relative, isAbsolute } from 'node:path';
+import { spawn } from 'node:child_process';
+import { relative, isAbsolute, resolve as resolvePath } from 'node:path';
 import fg from 'fast-glob';
 import { loadConfig, findLockFile, logger } from '@dcache/config';
 import { computeHash } from '@dcache/hasher';
@@ -9,9 +10,52 @@ import type { ParsedCommand } from '../index.js';
 
 type RunParsed = ParsedCommand & { command: 'run' };
 
-async function resolveFiles(parsed: RunParsed, ignore: string[]): Promise<string[]> {
+function gitTrackedFiles(cwd: string): Promise<Set<string> | null> {
+  return new Promise((resolveFn) => {
+    const child = spawn('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
+      cwd,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const chunks: Buffer[] = [];
+    child.stdout.on('data', (c) => chunks.push(c));
+    child.on('error', () => resolveFn(null));
+    child.on('close', (code) => {
+      if (code !== 0) {
+        resolveFn(null);
+        return;
+      }
+      const set = new Set<string>();
+      for (const rel of Buffer.concat(chunks).toString('utf-8').split('\0')) {
+        if (rel) set.add(resolvePath(cwd, rel));
+      }
+      resolveFn(set);
+    });
+  });
+}
+
+async function resolveFiles(
+  parsed: RunParsed,
+  ignore: string[],
+  respectGitignore: boolean,
+  cwd: string,
+): Promise<string[]> {
   if (parsed.mode === 'glob') {
     const files = await fg(parsed.glob, { absolute: true, dot: false, ignore });
+    if (respectGitignore) {
+      const tracked = await gitTrackedFiles(cwd);
+      if (!tracked) {
+        logger.warn('respectGitignore is enabled but `git ls-files` failed — keeping all matched files');
+      } else {
+        const filtered = files.filter((f) => tracked.has(f));
+        if (filtered.length === 0 && files.length > 0) {
+          logger.warn('respectGitignore filtered out every matched file');
+        }
+        if (filtered.length === 0) {
+          logger.warn(`No files matched glob pattern: ${parsed.glob}`);
+        }
+        return filtered;
+      }
+    }
     if (files.length === 0) {
       logger.warn(`No files matched glob pattern: ${parsed.glob}`);
     }
@@ -43,12 +87,17 @@ async function resolveOutputs(parsed: RunParsed): Promise<string[]> {
   return [];
 }
 
-function buildTaskManifest(parsed: RunParsed, ignore: string[]): Record<string, unknown> {
+function buildTaskManifest(
+  parsed: RunParsed,
+  ignore: string[],
+  respectGitignore: boolean,
+): Record<string, unknown> {
   if (parsed.mode === 'glob') {
     return {
       command: parsed.taskCommand,
       glob: parsed.glob,
       ignore: [...ignore].sort(),
+      respectGitignore,
       extraArgs: parsed.extraArgs,
     };
   }
@@ -107,13 +156,13 @@ export async function runCommand(parsed: RunParsed): Promise<number> {
   const cache = await createCacheProvider(config.provider, config.cacheDir);
 
   const ignore = parsed.mode === 'glob' ? [...config.ignore, ...parsed.ignore] : [];
-  const files = await resolveFiles(parsed, ignore);
+  const files = await resolveFiles(parsed, ignore, config.respectGitignore, cwd);
   if (parsed.mode === 'nx' && files.length === 0) {
     return 1;
   }
 
   const outputs = await resolveOutputs(parsed);
-  const taskManifest = buildTaskManifest(parsed, ignore);
+  const taskManifest = buildTaskManifest(parsed, ignore, config.respectGitignore);
   const hash = await computeHash({ files, lockFilePath, taskManifest });
 
   logger.debug(`Computed hash: ${hash}`);
