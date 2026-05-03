@@ -6,6 +6,7 @@ export interface CacheEntry {
   stderr: string;
   createdAt: string;
   durationMs: number;
+  outputs: string[];
 }
 
 export interface CacheProvider {
@@ -13,4 +14,6 @@ export interface CacheProvider {
   set(hash: string, entry: CacheEntry): Promise<void>;
   has(hash: string): Promise<boolean>;
   clear(): Promise<void>;
+  getArtifact(hash: string): Promise<Buffer | null>;
+  setArtifact(hash: string, data: Buffer): Promise<void>;
 }

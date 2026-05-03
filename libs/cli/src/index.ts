@@ -3,8 +3,8 @@ import { runCommand } from './commands/run.js';
 import { clearCommand } from './commands/clear.js';
 
 export type ParsedCommand =
-  | { command: 'run'; mode: 'glob'; taskCommand: string; glob: string; extraArgs: string[] }
-  | { command: 'run'; mode: 'nx'; task: string; project: string; extraArgs: string[] }
+  | { command: 'run'; mode: 'glob'; taskCommand: string; glob: string; outputs: string[]; extraArgs: string[] }
+  | { command: 'run'; mode: 'nx'; task: string; project: string; outputs: string[]; extraArgs: string[] }
   | { command: 'clear' }
   | { command: 'help' };
 
@@ -18,8 +18,28 @@ Commands:
 Options:
   --glob <pattern>      Glob pattern for source files
   --project <name>      Nx project name
+  --output <pattern>    Capture this path/glob as a cached output (repeatable)
   --help, -h            Show help
 `;
+
+interface ExtractedOutputs {
+  outputs: string[];
+  rest: string[];
+}
+
+function extractOutputs(args: string[]): ExtractedOutputs {
+  const outputs: string[] = [];
+  const rest: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--output' && i + 1 < args.length) {
+      outputs.push(args[i + 1]);
+      i++;
+      continue;
+    }
+    rest.push(args[i]);
+  }
+  return { outputs, rest };
+}
 
 export function parseArgs(argv: string[]): ParsedCommand {
   if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) {
@@ -33,7 +53,7 @@ export function parseArgs(argv: string[]): ParsedCommand {
   }
 
   if (command === 'run') {
-    const rest = argv.slice(1);
+    const { outputs, rest } = extractOutputs(argv.slice(1));
     const globIdx = rest.indexOf('--glob');
     const projectIdx = rest.indexOf('--project');
 
@@ -41,14 +61,14 @@ export function parseArgs(argv: string[]): ParsedCommand {
       const taskCommand = rest.slice(0, globIdx).join(' ');
       const glob = rest[globIdx + 1];
       const extraArgs = rest.slice(globIdx + 2);
-      return { command: 'run', mode: 'glob', taskCommand, glob, extraArgs };
+      return { command: 'run', mode: 'glob', taskCommand, glob, outputs, extraArgs };
     }
 
     if (projectIdx !== -1 && projectIdx + 1 < rest.length) {
       const task = rest.slice(0, projectIdx).join(' ');
       const project = rest[projectIdx + 1];
       const extraArgs = rest.slice(projectIdx + 2);
-      return { command: 'run', mode: 'nx', task, project, extraArgs };
+      return { command: 'run', mode: 'nx', task, project, outputs, extraArgs };
     }
 
     logger.error('run command requires --glob <pattern> or --project <name>');

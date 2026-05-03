@@ -14,6 +14,7 @@ function makeCacheEntry(overrides: Partial<CacheEntry> = {}): CacheEntry {
     stderr: '',
     createdAt: '2026-01-01T00:00:00Z',
     durationMs: 100,
+    outputs: [],
     ...overrides,
   };
 }
@@ -107,5 +108,22 @@ describe('FilesystemCacheProvider', () => {
     const provider = new FilesystemCacheProvider(cacheDir);
 
     await expect(provider.clear()).resolves.toBeUndefined();
+  });
+
+  it('returns null for missing artifact', async () => {
+    const cacheDir = join(makeTempDir(), 'cache');
+    const provider = new FilesystemCacheProvider(cacheDir);
+    expect(await provider.getArtifact('nope')).toBeNull();
+  });
+
+  it('round-trips an artifact buffer', async () => {
+    const cacheDir = join(makeTempDir(), 'cache');
+    const provider = new FilesystemCacheProvider(cacheDir);
+    const hash = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2';
+    const data = Buffer.from('binary-blob');
+
+    await provider.setArtifact(hash, data);
+    const got = await provider.getArtifact(hash);
+    expect(got?.equals(data)).toBe(true);
   });
 });
