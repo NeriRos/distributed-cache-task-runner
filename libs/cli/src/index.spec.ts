@@ -26,6 +26,7 @@ describe('parseArgs', () => {
       mode: 'glob',
       taskCommand: 'nx lint mylib',
       glob: 'libs/mylib/src/**',
+      ignore: [],
       outputs: [],
       extraArgs: [],
     });
@@ -39,8 +40,32 @@ describe('parseArgs', () => {
       mode: 'glob',
       taskCommand: 'echo hello',
       glob: '*.ts',
+      ignore: [],
       outputs: [],
       extraArgs: ['--verbose'],
+    });
+  });
+
+  it('collects --ignore flags (repeatable, glob mode)', () => {
+    const result = parseArgs([
+      'run',
+      'tsc',
+      '--glob',
+      '**/*.ts',
+      '--ignore',
+      '**/dist/**',
+      '--ignore',
+      '**/.vercel/**',
+    ]);
+
+    expect(result).toEqual({
+      command: 'run',
+      mode: 'glob',
+      taskCommand: 'tsc',
+      glob: '**/*.ts',
+      ignore: ['**/dist/**', '**/.vercel/**'],
+      outputs: [],
+      extraArgs: [],
     });
   });
 
@@ -100,6 +125,7 @@ describe('parseArgs', () => {
       mode: 'glob',
       taskCommand: 'tsc',
       glob: '*.ts',
+      ignore: [],
       outputs: ['dist'],
       extraArgs: [],
     });

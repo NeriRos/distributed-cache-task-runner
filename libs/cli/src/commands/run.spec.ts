@@ -35,6 +35,7 @@ describe('runCommand', () => {
       mode: 'glob',
       taskCommand: 'echo cache-miss-test',
       glob: join(tempDir, '*.ts'),
+      ignore: [],
       outputs: [],
       extraArgs: [],
     });
@@ -51,6 +52,7 @@ describe('runCommand', () => {
       mode: 'glob' as const,
       taskCommand: 'echo hit-test',
       glob: join(tempDir, '*.ts'),
+      ignore: [],
       outputs: [],
       extraArgs: [],
     };
@@ -70,6 +72,7 @@ describe('runCommand', () => {
       mode: 'glob',
       taskCommand: 'sh',
       glob: join(tempDir, '*.ts'),
+      ignore: [],
       outputs: [],
       extraArgs: ['-c', 'exit 42'],
     });
@@ -102,6 +105,7 @@ describe('runCommand', () => {
       mode: 'glob' as const,
       taskCommand: 'sh',
       glob: join(tempDir, 'src.ts'),
+      ignore: [],
       outputs: ['dist'],
       extraArgs: ['-c', 'mkdir -p dist && echo built > dist/bundle.js'],
     };
@@ -129,6 +133,7 @@ describe('runCommand', () => {
       mode: 'glob',
       taskCommand: 'sh',
       glob: join(tempDir, 'src.ts'),
+      ignore: [],
       outputs: ['dist'],
       extraArgs: ['-c', 'exit 1'],
     });
@@ -141,6 +146,7 @@ describe('runCommand', () => {
       mode: 'glob',
       taskCommand: 'sh',
       glob: join(tempDir, 'src.ts'),
+      ignore: [],
       outputs: ['dist'],
       extraArgs: ['-c', 'exit 1'],
     });

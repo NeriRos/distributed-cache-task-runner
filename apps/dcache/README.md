@@ -23,6 +23,20 @@ dcache run "tsc --noEmit" --glob "src/**/*.ts"
 dcache run "eslint ." --glob "src/**/*.{ts,tsx}"
 ```
 
+#### Excluding files with `--ignore`
+
+Use `--ignore` (repeatable) to drop paths from the hash input. This is essential for shared caches: any file that exists on one machine but not another (build outputs, local artifacts, generated debug bundles) will produce different hashes and force misses. Exclude them so the hash only depends on tracked source.
+
+```bash
+dcache run "eslint ." \
+  --glob "{apps,libs}/**/*.{ts,tsx,js,mjs}" \
+  --ignore "**/dist/**" \
+  --ignore "**/.vercel/**" \
+  --ignore "**/coverage/**"
+```
+
+The ignore patterns are also part of the cache-key manifest, so changing them invalidates the cache rather than silently reusing a stale entry.
+
 ### Nx mode
 
 ```bash
@@ -62,7 +76,16 @@ Configuration lives in `dcache.config.json` in the current working directory. If
 | `cacheDir` | `string` | `node_modules/.cache/dcache` |
 | `logLevel` | `"debug" \| "info" \| "warn" \| "error"` | `"info"` |
 | `envFile` | `string` (path) | — |
+| `ignore` | `string[]` | `[]` |
 | `provider` | provider config (see below) | filesystem at `cacheDir` |
+
+`ignore` patterns apply to every glob-mode `run` and are merged with any `--ignore` flags passed on the command line. Use this for paths that should always be excluded from the hash on this project (build outputs, local artifacts, etc.):
+
+```json
+{
+  "ignore": ["**/dist/**", "**/.vercel/**", "**/coverage/**", "**/.nx/**"]
+}
+```
 
 String values support `${ENV_VAR}` interpolation. Use `envFile` to load a `.env` before interpolation runs — keeps secrets out of the config file.
 
