@@ -119,9 +119,31 @@ export async function runCommand(parsed: RunParsed): Promise<number> {
   const cached = await cache.get(hash);
   if (cached) {
     logger.info('Cache hit — skipping task execution');
+    const cacheStart = performance.now();
     await restoreOutputs(cache, cached, cwd);
     if (cached.stdout) process.stdout.write(cached.stdout);
     if (cached.stderr) process.stderr.write(cached.stderr);
+    const cacheRestoreMs = Math.round(performance.now() - cacheStart);
+
+    const nextHitCount = (cached.hitCount ?? 0) + 1;
+    const interval = config.benchmarkInterval;
+    const shouldBenchmark = interval > 0 && (nextHitCount === 1 || nextHitCount % interval === 0);
+
+    let directDurationMs = cached.durationMs;
+    if (shouldBenchmark) {
+      const { cmd, args } = parseCommand(parsed);
+      const benchmark = await runTask(cmd, args);
+      directDurationMs = benchmark.durationMs;
+      logger.debug(`Benchmark: cache=${cacheRestoreMs}ms direct=${directDurationMs}ms`);
+      if (cacheRestoreMs > directDurationMs * 1.2) {
+        const taskName = parsed.mode === 'glob' ? parsed.taskCommand : `${parsed.project}:${parsed.task}`;
+        logger.warn(
+          `Cache overhead (${cacheRestoreMs}ms) exceeds direct execution (${directDurationMs}ms) for "${taskName}" — caching may be hurting; consider running the command directly`,
+        );
+      }
+    }
+
+    await cache.set(hash, { ...cached, hitCount: nextHitCount, durationMs: directDurationMs });
     return cached.exitCode;
   }
 
@@ -140,6 +162,7 @@ export async function runCommand(parsed: RunParsed): Promise<number> {
     createdAt: new Date().toISOString(),
     durationMs: result.durationMs,
     outputs: storedOutputs,
+    hitCount: 0,
   });
 
   if (result.stdout) process.stdout.write(result.stdout);

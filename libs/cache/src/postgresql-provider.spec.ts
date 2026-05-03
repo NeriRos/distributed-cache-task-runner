@@ -12,6 +12,7 @@ function makeCacheEntry(overrides: Partial<CacheEntry> = {}): CacheEntry {
     createdAt: '2026-01-01T00:00:00.000Z',
     durationMs: 100,
     outputs: [],
+    hitCount: 0,
     ...overrides,
   };
 }
@@ -39,8 +40,8 @@ function makeFakePool() {
       return { rows: data ? [{ data }] : [] };
     }
     if (trimmed.startsWith('INSERT')) {
-      const [hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs] = values ?? [];
-      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs });
+      const [hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count] = values ?? [];
+      store.set(hash as string, { hash, task, exit_code, stdout, stderr, created_at, duration_ms, outputs, hit_count });
       return { rows: [] };
     }
     if (trimmed.startsWith('SELECT 1')) {

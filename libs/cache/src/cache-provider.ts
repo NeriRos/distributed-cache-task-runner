@@ -7,6 +7,7 @@ export interface CacheEntry {
   createdAt: string;
   durationMs: number;
   outputs: string[];
+  hitCount?: number;
 }
 
 export interface CacheProvider {
